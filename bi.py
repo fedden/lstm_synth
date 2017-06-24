@@ -114,9 +114,10 @@ class MonitorCallback(tflearn.callbacks.Callback):
         self.model = model
         self.tf_id = tf_id
 
-    def on_batch_end(self, training_state, snapshot=False):
-    	if training_state.global_loss < self.lowest_loss:
-            self.lowest_loss = training_state.global_loss
+    def on_batch_end(self, training_state, snapshot=False): 
+        not_zero = training_state.loss_value != 0.0
+        if training_state.loss_value < self.lowest_loss and not_zero:
+            self.lowest_loss = training_state.loss_value
             self.number_saves += 1
             self.model.save(self.tf_id + '_' + str(self.number_saves)  + '.tfl')
             
