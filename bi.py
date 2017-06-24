@@ -8,7 +8,7 @@ import tflearn
 import random
 import os
 
-data_path = u"/mnt/assets/flute"
+data_path = u"/home/lstm_synth/assets/flute"
 checkpoint = u"-4348-99000"
 fft_size = 512
 window_size = 256
@@ -115,10 +115,10 @@ class MonitorCallback(tflearn.callbacks.Callback):
         self.tf_id = tf_id
 
     def on_batch_end(self, training_state, snapshot=False):
-    	if training_state.global_loss < self.lowest_lost:
-            self.lowest_lost = training_state.global_loss
+    	if training_state.global_loss < self.lowest_loss:
+            self.lowest_loss = training_state.global_loss
             self.number_saves += 1
-            self.model.save(self.tf_id + '.tfl')
+            self.model.save(self.tf_id + '_' + str(self.number_saves)  + '.tfl')
             
 
 cp = os.path.join(checkpoint_path, (tf_id + u'.ckpt' + checkpoint))
@@ -128,8 +128,8 @@ callback = MonitorCallback(model, os.path.join(checkpoint_path, tf_id))
 if training:
     model.fit(train_x, train_y, validation_set=((valid_x, valid_y)),
               show_metric=True, batch_size=batch_size, n_epoch=training_iters,
-              snapshot_epoch=True, snapshot_step=1000, run_id=tf_id,
-              callbacks=[])
+              snapshot_epoch=False, snapshot_step=1000, run_id=tf_id,
+              callbacks=callback)
 else:
     model.load(cp)
 
